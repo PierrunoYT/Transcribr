@@ -1,4 +1,6 @@
-# Bulk YouTube Transcriber
+# ScribeTube
+
+> Bulk YouTube Transcriber
 
 A 1-click Pinokio launcher that downloads the audio from one or many YouTube
 videos (or entire playlists) and transcribes them in bulk using

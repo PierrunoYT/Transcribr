@@ -1,4 +1,4 @@
-# Bulk YouTube Transcriber dependencies
+# ScribeTube (Bulk YouTube Transcriber) dependencies
 
 # Transcription engine (CTranslate2-based Whisper, no torch required)
 faster-whisper>=1.1.0

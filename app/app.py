@@ -1,6 +1,6 @@
 """
-Bulk YouTube Transcriber
-========================
+ScribeTube — Bulk YouTube Transcriber
+=====================================
 A Gradio app that downloads the audio from one or many YouTube URLs
 (including playlists) and transcribes them with faster-whisper.
 
@@ -249,9 +249,10 @@ def transcribe_bulk(urls_text, model_size, device_choice, language, fmt, progres
 # ---------------------------------------------------------------------------
 
 def build_interface():
-    with gr.Blocks(title="Bulk YouTube Transcriber", theme=gr.themes.Soft()) as app:
+    with gr.Blocks(title="ScribeTube", theme=gr.themes.Soft()) as app:
         gr.Markdown(
-            "# 🎬 Bulk YouTube Transcriber\n"
+            "# 🎬 ScribeTube\n"
+            "### Bulk YouTube Transcriber\n"
             "Paste YouTube video or playlist URLs (one per line) and transcribe "
             "them all with faster-whisper."
         )
@@ -292,7 +293,7 @@ def build_interface():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bulk YouTube Transcriber")
+    parser = argparse.ArgumentParser(description="ScribeTube — Bulk YouTube Transcriber")
     default_host = "127.0.0.1" if sys.platform == "win32" else "0.0.0.0"
     parser.add_argument("--host", type=str, default=os.getenv("GRADIO_SERVER_NAME", default_host))
     parser.add_argument(
@@ -304,7 +305,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 70)
-    print("Bulk YouTube Transcriber")
+    print("ScribeTube — Bulk YouTube Transcriber")
     print(f"ffmpeg: {FFMPEG_EXE}")
     print("=" * 70)
 

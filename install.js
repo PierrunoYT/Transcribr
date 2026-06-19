@@ -3,7 +3,7 @@ module.exports = {
     {
       method: "notify",
       params: {
-        html: "Installing Bulk YouTube Transcriber..."
+        html: "Installing ScribeTube..."
       }
     },
     // Install transcription + download dependencies

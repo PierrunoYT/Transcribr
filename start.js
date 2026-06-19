@@ -4,7 +4,7 @@ module.exports = {
     {
       method: "notify",
       params: {
-        html: "Starting Bulk YouTube Transcriber..."
+        html: "Starting ScribeTube..."
       }
     },
     {
@@ -35,7 +35,7 @@ module.exports = {
     {
       method: "notify",
       params: {
-        html: "✅ Bulk YouTube Transcriber is running!"
+        html: "✅ ScribeTube is running!"
       }
     }
   ]
