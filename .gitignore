@@ -1,0 +1,7 @@
+env/
+app/transcripts/
+app/models/
+
+# Python bytecode
+__pycache__/
+*.pyc

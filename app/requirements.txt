@@ -1,0 +1,13 @@
+# Bulk YouTube Transcriber dependencies
+
+# Transcription engine (CTranslate2-based Whisper, no torch required)
+faster-whisper>=1.1.0
+
+# YouTube / media downloader
+yt-dlp>=2024.8.6
+
+# Bundled ffmpeg binary so audio extraction works without a system install
+imageio-ffmpeg>=0.5.1
+
+# Web interface
+gradio>=5.0.0,<6.0.0

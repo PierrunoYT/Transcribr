@@ -1,0 +1,5 @@
+{
+  "title": "Bulk YouTube Transcriber",
+  "description": "Download and transcribe many YouTube videos or whole playlists at once with faster-whisper. Outputs txt, srt, vtt, or json.",
+  "icon": "icon.jpg"
+}
