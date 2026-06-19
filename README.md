@@ -2,9 +2,10 @@
 
 > Bulk Audio & Video Transcriber
 
-A 1-click Pinokio launcher that downloads the audio from one or many YouTube
-videos (or entire playlists) and transcribes them in bulk using
-[faster-whisper](https://github.com/SYSTRAN/faster-whisper).
+A 1-click Pinokio launcher that transcribes audio in bulk using
+[faster-whisper](https://github.com/SYSTRAN/faster-whisper) — from one or many
+YouTube videos (or entire playlists) **and/or** your own uploaded audio/video
+files.
 
 ## What it does
 
@@ -20,7 +21,7 @@ videos (or entire playlists) and transcribes them in bulk using
 
 1. Click **Install** (installs dependencies; Whisper models download on first run).
 2. Click **Start**, then open the Web UI.
-3. Paste YouTube URLs, choose a model size, device, language, and output format.
+3. Paste YouTube URLs and/or upload audio/video files, then choose a model size, device, language, and output format.
 4. Click **Transcribe**. Results appear in the table and a `.zip` download.
 
 Transcripts are also saved under `app/transcripts/run_<timestamp>/`.
