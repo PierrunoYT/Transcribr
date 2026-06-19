@@ -1,6 +1,6 @@
-# ScribeTube
+# Transcribr
 
-> Bulk YouTube Transcriber
+> Bulk Audio & Video Transcriber
 
 A 1-click Pinokio launcher that downloads the audio from one or many YouTube
 videos (or entire playlists) and transcribes them in bulk using
@@ -9,6 +9,7 @@ videos (or entire playlists) and transcribes them in bulk using
 ## What it does
 
 - Paste any number of YouTube video **or** playlist URLs (one per line).
+- **Or upload your own audio/video files** to transcribe them directly.
 - Downloads the best audio with `yt-dlp` (bundled `ffmpeg`, no system install).
 - Transcribes each item with a Whisper model (`tiny` → `large-v3`).
 - Runs on **GPU** (NVIDIA, automatic) or **CPU**.

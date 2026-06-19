@@ -1,10 +1,10 @@
-# Logo Prompt — ScribeTube (Bulk YouTube Transcriber)
+# Logo Prompt — Transcribr (Bulk Audio & Video Transcriber)
 
 ## Primary prompt
 
 ```
-A modern, minimalist app icon logo for "ScribeTube", a bulk YouTube
-transcription tool.
+A modern, minimalist app icon logo for "Transcribr", a bulk audio &
+video transcription tool.
 Central concept: a red YouTube-style play button transforming into flowing
 lines of text / subtitle bars on the right, symbolizing video-to-text
 conversion. Include subtle stacked/duplicated layers behind the play button

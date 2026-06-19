@@ -1,5 +1,5 @@
 {
-  "title": "ScribeTube",
-  "description": "Download and transcribe many YouTube videos or whole playlists at once with faster-whisper. Outputs txt, srt, vtt, or json.",
+  "title": "Transcribr",
+  "description": "Bulk transcribe many YouTube videos, whole playlists, or your own uploaded audio/video files at once with faster-whisper. Outputs txt, srt, vtt, or json.",
   "icon": "icon.png"
 }

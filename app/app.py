@@ -1,6 +1,6 @@
 """
-ScribeTube — Bulk YouTube Transcriber
-=====================================
+Transcribr — Bulk Audio & Video Transcriber
+===========================================
 A Gradio app that downloads the audio from one or many YouTube URLs
 (including playlists) and transcribes them with faster-whisper.
 
@@ -178,16 +178,21 @@ def _download_audio(url: str, dest_dir: str):
 # Main job
 # ---------------------------------------------------------------------------
 
-def transcribe_bulk(urls_text, model_size, device_choice, language, fmt, progress=gr.Progress()):
-    if not urls_text or not urls_text.strip():
-        return "Please paste at least one YouTube URL.", [], None
-
+def transcribe_bulk(urls_text, uploads, model_size, device_choice, language, fmt, progress=gr.Progress()):
     language = (language or "").strip() or None
 
-    progress(0, desc="Expanding URLs / playlists...")
-    entries = _expand_urls(urls_text)
-    if not entries:
-        return "No valid URLs found.", [], None
+    progress(0, desc="Collecting inputs...")
+    # Build a unified job list: YouTube URLs (need downloading) + uploaded files.
+    jobs = []  # each: (kind, ref) where kind in {"url", "file"}
+    if urls_text and urls_text.strip():
+        jobs.extend(("url", u) for u in _expand_urls(urls_text))
+    for up in uploads or []:
+        path = up if isinstance(up, str) else getattr(up, "name", None)
+        if path and os.path.exists(path):
+            jobs.append(("file", path))
+
+    if not jobs:
+        return "Add at least one YouTube URL or upload an audio/video file.", [], None
 
     progress(0.05, desc=f"Loading {model_size} model...")
     model = get_model(model_size, device_choice)
@@ -197,17 +202,23 @@ def transcribe_bulk(urls_text, model_size, device_choice, language, fmt, progres
 
     log_rows = []
     files = []
-    total = len(entries)
+    total = len(jobs)
     tmp_dir = tempfile.mkdtemp(prefix="bt_audio_")
     try:
-        for idx, url in enumerate(entries):
+        for idx, (kind, ref) in enumerate(jobs):
             frac = 0.05 + 0.9 * (idx / total)
-            progress(frac, desc=f"[{idx + 1}/{total}] Downloading...")
-            try:
-                audio_path, title = _download_audio(url, tmp_dir)
-            except Exception as exc:  # noqa: BLE001
-                log_rows.append([url, "download failed", str(exc)[:200]])
-                continue
+            if kind == "url":
+                progress(frac, desc=f"[{idx + 1}/{total}] Downloading...")
+                try:
+                    audio_path, title = _download_audio(ref, tmp_dir)
+                    cleanup = True
+                except Exception as exc:  # noqa: BLE001
+                    log_rows.append([ref, "download failed", str(exc)[:200]])
+                    continue
+            else:
+                audio_path = ref
+                title = os.path.splitext(os.path.basename(ref))[0]
+                cleanup = False  # keep the user's uploaded file
 
             progress(frac, desc=f"[{idx + 1}/{total}] Transcribing {title[:40]}...")
             try:
@@ -219,10 +230,11 @@ def transcribe_bulk(urls_text, model_size, device_choice, language, fmt, progres
                 log_rows.append([title, "transcription failed", str(exc)[:200]])
                 continue
             finally:
-                try:
-                    os.remove(audio_path)
-                except OSError:
-                    pass
+                if cleanup:
+                    try:
+                        os.remove(audio_path)
+                    except OSError:
+                        pass
 
             content = _render(segments, info, title, fmt)
             out_path = os.path.join(run_dir, f"{_safe_name(title)}.{fmt}")
@@ -249,19 +261,24 @@ def transcribe_bulk(urls_text, model_size, device_choice, language, fmt, progres
 # ---------------------------------------------------------------------------
 
 def build_interface():
-    with gr.Blocks(title="ScribeTube", theme=gr.themes.Soft()) as app:
+    with gr.Blocks(title="Transcribr", theme=gr.themes.Soft()) as app:
         gr.Markdown(
-            "# 🎬 ScribeTube\n"
-            "### Bulk YouTube Transcriber\n"
-            "Paste YouTube video or playlist URLs (one per line) and transcribe "
-            "them all with faster-whisper."
+            "# 🎬 Transcribr\n"
+            "### Bulk Audio & Video Transcriber\n"
+            "Paste YouTube video or playlist URLs (one per line) **and/or** upload "
+            "your own audio/video files, then transcribe them all with faster-whisper."
         )
         with gr.Row():
             with gr.Column(scale=2):
                 urls = gr.Textbox(
                     label="YouTube URLs",
-                    lines=10,
+                    lines=8,
                     placeholder="https://www.youtube.com/watch?v=...\nhttps://www.youtube.com/playlist?list=...",
+                )
+                uploads = gr.File(
+                    label="Or upload audio/video files",
+                    file_count="multiple",
+                    file_types=["audio", "video"],
                 )
             with gr.Column(scale=1):
                 model_size = gr.Dropdown(
@@ -286,14 +303,14 @@ def build_interface():
 
         run_btn.click(
             transcribe_bulk,
-            inputs=[urls, model_size, device_choice, language, fmt],
+            inputs=[urls, uploads, model_size, device_choice, language, fmt],
             outputs=[status, results, download],
         )
     return app
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ScribeTube — Bulk YouTube Transcriber")
+    parser = argparse.ArgumentParser(description="Transcribr — Bulk Audio & Video Transcriber")
     default_host = "127.0.0.1" if sys.platform == "win32" else "0.0.0.0"
     parser.add_argument("--host", type=str, default=os.getenv("GRADIO_SERVER_NAME", default_host))
     parser.add_argument(
@@ -305,7 +322,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 70)
-    print("ScribeTube — Bulk YouTube Transcriber")
+    print("Transcribr — Bulk Audio & Video Transcriber")
     print(f"ffmpeg: {FFMPEG_EXE}")
     print("=" * 70)
 
