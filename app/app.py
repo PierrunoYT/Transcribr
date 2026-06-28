@@ -199,7 +199,7 @@ def transcribe_bulk(urls_text, uploads, model_size, device_choice, language, fmt
             jobs.append(("file", path))
 
     if not jobs:
-        return "Add at least one YouTube URL or upload an audio/video file.", [], None
+        return "Add at least one YouTube URL or upload an audio/video file.", [], None, ""
 
     progress(0.05, desc=f"Loading {model_size} model...")
     model = get_model(model_size, device_choice)
@@ -209,6 +209,9 @@ def transcribe_bulk(urls_text, uploads, model_size, device_choice, language, fmt
 
     log_rows = []
     files = []
+    last_content = ""
+    last_title = ""
+    last_lang = ""
     total = len(jobs)
     tmp_dir = tempfile.mkdtemp(prefix="bt_audio_")
     try:
@@ -248,19 +251,35 @@ def transcribe_bulk(urls_text, uploads, model_size, device_choice, language, fmt
             with open(out_path, "w", encoding="utf-8") as fh:
                 fh.write(content)
             files.append(out_path)
+            last_content = content
+            last_title = title
+            last_lang = info.language
             log_rows.append([title, f"ok ({info.language})", f"{len(segments)} segments"])
 
         progress(0.97, desc="Packaging results...")
         zip_path = None
-        if files:
-            zip_base = run_dir
-            zip_path = shutil.make_archive(zip_base, "zip", run_dir)
+        single_file = None
+        transcript_text = ""
+        if len(files) == 1:
+            single_file = files[0]
+            transcript_text = last_content
+        elif len(files) > 1:
+            zip_path = shutil.make_archive(run_dir, "zip", run_dir)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    summary = f"Done. {len(files)}/{total} transcribed. Saved to {run_dir}"
+    n = len(files)
+    if n == 1:
+        summary = (
+            f"Done. 1/{total} transcribed ({last_title[:60]} — {last_lang}). "
+            f"Text shown below, download available."
+        )
+        download_out = single_file
+    else:
+        summary = f"Done. {n}/{total} transcribed. Saved to {run_dir}"
+        download_out = zip_path
     progress(1.0, desc="Complete")
-    return summary, log_rows, zip_path
+    return summary, log_rows, download_out, transcript_text
 
 
 # ---------------------------------------------------------------------------
@@ -306,12 +325,19 @@ def build_interface():
             label="Results",
             wrap=True,
         )
-        download = gr.File(label="Download all transcripts (.zip)")
+        download = gr.File(label="Download transcript(s)")
+        transcript_box = gr.Textbox(
+            label="Transcript",
+            lines=20,
+            max_lines=50,
+            show_copy_button=True,
+            interactive=False,
+        )
 
         run_btn.click(
             transcribe_bulk,
             inputs=[urls, uploads, model_size, device_choice, language, fmt],
-            outputs=[status, results, download],
+            outputs=[status, results, download, transcript_box],
         )
     return app
 
