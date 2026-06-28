@@ -15,7 +15,6 @@ import shutil
 import sys
 import tempfile
 import traceback
-import warnings
 from datetime import datetime
 
 import gradio as gr
@@ -39,12 +38,6 @@ OUTPUT_FORMATS = ["txt", "srt", "vtt", "json"]
 FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 os.environ.setdefault("PATH", "")
 os.environ["PATH"] = os.path.dirname(FFMPEG_EXE) + os.pathsep + os.environ["PATH"]
-
-# ---------------------------------------------------------------------------
-# Warnings
-# ---------------------------------------------------------------------------
-
-warnings.filterwarnings("ignore", category=Warning)
 
 # ---------------------------------------------------------------------------
 # Model cache
@@ -144,7 +137,7 @@ def _expand_urls(raw: str):
     """Turn the textbox into individual entries, expanding playlists."""
     urls = [u.strip() for u in raw.replace(",", "\n").splitlines() if u.strip()]
     entries = []
-    flat_opts = {"quiet": True, "skip_download": True, "extract_flat": True}
+    flat_opts = {"quiet": True, "skip_download": True, "extract_flat": True, "no_warnings": True}
     with yt_dlp.YoutubeDL(flat_opts) as ydl:
         for url in urls:
             try:
